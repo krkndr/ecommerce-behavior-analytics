@@ -14,7 +14,3 @@ CREATE TABLE staging.raw_events (
 -- Load raw data from the CSV dump
 COPY staging.raw_events FROM 'D:\KaggleData\2019-Oct.csv' DELIMITER ',' CSV HEADER;
 
--- Create a 1M rows subset for local development and modeling
-CREATE TABLE staging.events_subset AS 
-SELECT * FROM staging.raw_events 
-LIMIT 1000000;
