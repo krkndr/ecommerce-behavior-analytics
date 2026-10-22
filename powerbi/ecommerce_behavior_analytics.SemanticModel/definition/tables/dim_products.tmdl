@@ -1,0 +1,88 @@
+table dim_products
+	lineageTag: 74bf3715-e724-4c94-b731-6ece5fc338fc
+
+	column product_id
+		dataType: int64
+		isNullable: false
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 34b58edb-0668-40ee-bf69-7a6624e00d8b
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 873815e5-d3db-4a7c-97ee-305d14ee3653
+		summarizeBy: none
+		sourceColumn: category_id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = User
+
+	column category_code
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 5bd9426c-93c8-43cf-8c5c-66ec710625da
+		summarizeBy: none
+		sourceColumn: category_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column brand
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: a2fd01fb-1368-4f47-a324-a25a794e6c9b
+		summarizeBy: none
+		sourceColumn: brand
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_level_1
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: cd262a12-a804-4b5a-87d6-bd8d840ba8b6
+		summarizeBy: none
+		sourceColumn: category_level_1
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_level_2
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: d069c2bb-9b16-4731-8f3b-0c92bc010d3e
+		summarizeBy: none
+		sourceColumn: category_level_2
+
+		annotation SummarizationSetBy = Automatic
+
+	column last_price
+		dataType: double
+		isHidden
+		sourceProviderType: decimal
+		lineageTag: b2c7d8bc-2950-47a8-9220-acced9aab381
+		summarizeBy: sum
+		sourceColumn: last_price
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition dim_products = m
+		mode: directQuery
+		source =
+				let
+				  Джерело = PostgreSQL.Database("localhost", "postgres"),
+				  #"Навігація 1" = Джерело{[Schema = "analytics", Item = "dim_products"]}[Data]
+				in
+				  #"Навігація 1"
+
+	annotation PBI_ResultType = Table
+

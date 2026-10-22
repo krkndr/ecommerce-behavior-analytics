@@ -1,0 +1,106 @@
+table fact_events
+	lineageTag: ec46f001-2f14-43e8-a728-82ce35e4b94e
+
+	column event_time
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: b88fab4c-5e47-4d29-82ff-688a994527b7
+		summarizeBy: none
+		sourceColumn: event_time
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_type
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: cd8c1075-2331-4954-9966-709115b092c8
+		summarizeBy: none
+		sourceColumn: event_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 82dba73b-fc62-49b0-9dd4-1f83a06edb93
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 4822bcd9-e8ee-433c-8c1b-1d57153e3c17
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_session
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: a10ffc45-7dfb-4e9a-919e-a018c0031e29
+		summarizeBy: none
+		sourceColumn: user_session
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_date
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: 6f1d8787-14ed-4e69-8f86-cb3941a5fb50
+		summarizeBy: none
+		sourceColumn: event_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column event_hour
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 5eb414df-2be2-4c6e-aed6-88b6d3f0f0df
+		summarizeBy: none
+		sourceColumn: event_hour
+
+		annotation SummarizationSetBy = Automatic
+
+	column price
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: c79f2a48-3915-4576-b1c7-76f8e0f27dfb
+		summarizeBy: sum
+		sourceColumn: price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column price_segment
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: f5c0f7d0-60f9-4193-902b-0281bfe12807
+		summarizeBy: none
+		sourceColumn: price_segment
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_events = m
+		mode: directQuery
+		source =
+				let
+				  Джерело = PostgreSQL.Database("localhost", "postgres"),
+				  #"Навігація 1" = Джерело{[Schema = "analytics", Item = "fact_events"]}[Data]
+				in
+				  #"Навігація 1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Навігація
+

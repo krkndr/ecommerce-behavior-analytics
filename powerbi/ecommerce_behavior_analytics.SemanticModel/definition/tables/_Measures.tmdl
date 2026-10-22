@@ -1,0 +1,465 @@
+table _Measures
+	lineageTag: 3b413bdf-fecc-4b36-847a-fc590572f1e2
+
+	measure 'Total Purchases' =
+			
+			CALCULATE(
+			    COUNTROWS(fact_events),
+			    fact_events[event_type] = "purchase"
+			)
+		formatString: #,0
+		displayFolder: 01_Business Health
+		lineageTag: 121e52a4-b1da-4923-98a4-96a3b46c96b0
+
+	measure 'Total Events' = COUNTROWS(fact_events)
+		formatString: #,0
+		displayFolder: 01_Business Health
+		lineageTag: 08b5256c-1a33-481c-a614-18d0e7480270
+
+	measure Dynamic_Color = ```
+			
+			        VAR CurrentValue = [Avg Events per Day]
+			        VAR MaxValue =
+			            CALCULATE(
+			                MAXX(VALUES('dim_date'[Day of Week]), [Avg Events per Day]),
+			                ALLSELECTED('dim_date')
+			            )
+			        RETURN
+			            IF(CurrentValue = MaxValue, "#800020", "#D1D5DB")
+			```
+		displayFolder: 08_Traffic
+		lineageTag: 36cc81e0-efea-42fd-b860-0ef90ed590db
+
+	measure GMV = ```
+			
+			        CALCULATE(
+			            SUM(fact_events[price]),
+			            fact_events[event_type] = "purchase"
+			        )
+			```
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 01_Business Health
+		lineageTag: e959668c-a9ea-4f84-a142-1b40cc51ddad
+
+	measure 'Total Orders' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(fact_events[user_session]),
+			    fact_events[event_type] = "purchase"
+			)
+		formatString: #,0
+		displayFolder: 01_Business Health
+		lineageTag: 19a89fae-e804-402e-815c-1d909e200c60
+
+	measure AOV =
+			
+			DIVIDE([GMV], [Total Orders], 0)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 02_Unit Economics
+		lineageTag: 98e15286-2a9a-47a1-b733-53206bf54af6
+
+	measure ARPU =
+			
+			DIVIDE([GMV], [Total Active Users (MAU)], 0)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 02_Unit Economics
+		lineageTag: 4b28f414-29a0-41d3-8fbf-383e05d76758
+
+	measure 'Total Active Users (MAU)' = ```
+			
+			        CALCULATE(
+			            DISTINCTCOUNT(fact_events[user_id]),
+			            REMOVEFILTERS(fact_events[event_type])
+			        )
+			```
+		formatString: #,0
+		displayFolder: 03_Active Users
+		lineageTag: cb2f3aa3-86fe-4d87-87e8-dc0b7740a634
+
+	measure 'Unique Payers' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(fact_events[user_id]),
+			    fact_events[event_type] = "purchase"
+			)
+		formatString: #,0
+		displayFolder: 03_Active Users
+		lineageTag: 2cde107d-9001-4917-9688-869bfb5c5e41
+
+	measure 'Avg DAU' = ```
+			
+			        AVERAGEX(
+			            VALUES(fact_events[event_date]),
+			            CALCULATE(
+			                DISTINCTCOUNT(fact_events[user_id]),
+			                REMOVEFILTERS(fact_events[event_type])
+			            )
+			        )
+			```
+		formatString: #,0
+		displayFolder: 03_Active Users
+		lineageTag: 33fe4aab-ccb3-405a-b29a-f284b37aae97
+
+	measure ARPPU =
+			
+			DIVIDE([GMV], [Unique Payers], 0)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 02_Unit Economics
+		lineageTag: f5e8b73a-c664-475a-a765-39837616ddc0
+
+	measure 'Funnel 1_View' = ```
+			
+			CALCULATE(
+			    DISTINCTCOUNT(fact_events[user_session]), 
+			    fact_events[event_type] = "view"
+			)
+			```
+		formatString: #,0
+		displayFolder: 04_Sales Funnel
+		lineageTag: f6ff6e47-fa9c-4daf-88dc-a322ba31575f
+
+	measure 'Funnel 2_Cart' = ```
+			
+			CALCULATE(
+			    DISTINCTCOUNT(fact_funnel_steps[user_session]), 
+			    fact_funnel_steps[current_step] = "view",
+			    fact_funnel_steps[next_step] = "cart"
+			)
+			```
+		formatString: #,0
+		displayFolder: 04_Sales Funnel
+		lineageTag: e4025e68-3354-4b96-ba23-ea2a3ac3b9cb
+
+	measure 'Funnel 3_Purchase' = ```
+			
+			CALCULATE(
+			    DISTINCTCOUNT(fact_funnel_steps[user_session]), 
+			    fact_funnel_steps[current_step] = "cart", 
+			    fact_funnel_steps[next_step] = "purchase"
+			)
+			```
+		formatString: #,0
+		displayFolder: 04_Sales Funnel
+		lineageTag: d27b8395-75d0-4e29-a753-d4b51ff3994f
+
+	measure 'Avg Minutes to Purchase' =
+			
+			CALCULATE(
+			    AVERAGE(fact_funnel_steps[minutes_to_next_step]),
+			    fact_funnel_steps[current_step] = "cart",
+			    fact_funnel_steps[next_step] = "purchase"
+			)
+		formatString: 0.00
+		displayFolder: 04_Sales Funnel
+		lineageTag: 52cf61fd-ef06-4d08-9d05-466015bef1bb
+
+	measure 'Simple Views' = ```
+			
+			CALCULATE(
+			    COUNT(fact_events[product_id]), 
+			    fact_events[event_type] = "view"
+			)
+			```
+		formatString: #,0
+		displayFolder: 05_Catalog
+		lineageTag: ec446d04-2a84-4c38-a8aa-4b34299ce9fc
+
+	measure 'Category CR' =
+			
+			DIVIDE([Total Purchases], [Simple Views], 0)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 05_Catalog
+		lineageTag: d4801149-d96e-45df-b8f9-61def2de560d
+
+	measure 'Buyers (1 Purchase)' = ```
+			
+			VAR BuyersTable = 
+			    CALCULATETABLE(
+			        ADDCOLUMNS(
+			            VALUES(fact_events[user_id]),
+			            "PurchaseCount", CALCULATE(DISTINCTCOUNT(fact_events[user_session]))
+			        ),
+			        fact_events[event_type] = "purchase"
+			    )
+			RETURN 
+			COUNTROWS(FILTER(BuyersTable, [PurchaseCount] = 1))
+			```
+		formatString: #,0
+		displayFolder: 06_User Behavior
+		lineageTag: 467116c4-ecc7-41e2-b0c2-fecf4d67c588
+
+	measure 'Buyers (2+ Purchases)' = ```
+			
+			VAR BuyersTable = 
+			    CALCULATETABLE(
+			        ADDCOLUMNS(
+			            VALUES(fact_events[user_id]),
+			            "PurchaseCount", CALCULATE(DISTINCTCOUNT(fact_events[user_session]))
+			        ),
+			        fact_events[event_type] = "purchase"
+			    )
+			RETURN 
+			COUNTROWS(FILTER(BuyersTable, [PurchaseCount] > 1))
+			```
+		formatString: #,0
+		displayFolder: 06_User Behavior
+		lineageTag: e724bd24-7f60-443a-9f5f-3849cf25abc4
+
+	measure 'Avg Views per Session' = ```
+			
+			        DIVIDE(SUM(fact_sessions[views]), COUNTROWS(fact_sessions), 0)
+			```
+		formatString: 0.00
+		displayFolder: 06_User Behavior
+		lineageTag: 3f4685cc-4de3-4e1c-aac2-5965004e28a1
+
+	measure 'Total Carts' = ```
+			
+			CALCULATE(
+			    COUNT(fact_events[product_id]), 
+			    fact_events[event_type] = "cart"
+			)
+			```
+		formatString: #,0
+		displayFolder: 05_Catalog
+		lineageTag: d3cf5e74-529d-4e37-b82d-a4c6d18554b3
+
+	measure 'GMV (1 Purchase)' = ```
+			
+			CALCULATE(
+			    [GMV], 
+			    FILTER(
+			        VALUES(fact_events[user_id]),
+			        CALCULATE(DISTINCTCOUNT(fact_events[user_session]), fact_events[event_type] = "purchase") = 1
+			    )
+			)
+			```
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 06_User Behavior
+		lineageTag: 38d0b494-d756-4188-ad24-c47e0e8f47ef
+
+	measure 'GMV (2+ Purchases)' =
+			
+			CALCULATE(
+			    [GMV],
+			    FILTER(
+			        VALUES(fact_events[user_id]),
+			        CALCULATE(DISTINCTCOUNT(fact_events[user_session]), fact_events[event_type] = "purchase") > 1
+			    )
+			)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 06_User Behavior
+		lineageTag: 60325cea-832f-46f2-a180-9bd84ce228de
+
+	measure 'WAU (rolling 7d)' = ```
+			
+			        VAR EndDate = MAX(dim_date[Date])
+			        RETURN
+			            CALCULATE(
+			                DISTINCTCOUNT(fact_events[user_id]),
+			                REMOVEFILTERS(fact_events[event_type]),
+			                DATESBETWEEN(dim_date[Date], EndDate - 6, EndDate)
+			            )
+			```
+		formatString: #,0
+		displayFolder: 03_Active Users
+		lineageTag: 8410d8df-17cc-4fda-8f63-33e0e3516a3c
+
+	measure 'Sessions with View' = ```
+			
+			        CALCULATE(
+			            COUNTROWS(fact_sessions),
+			            fact_sessions[views] > 0
+			        )
+			```
+		formatString: #,0
+		displayFolder: 04_Sales Funnel
+		lineageTag: e8bf5cfd-a193-4655-a909-d1142a8cb0fb
+
+	measure 'Sessions with Cart' = ```
+			
+			        CALCULATE(
+			            COUNTROWS(fact_sessions),
+			            fact_sessions[has_cart] = TRUE()
+			        )
+			```
+		formatString: #,0
+		displayFolder: 04_Sales Funnel
+		lineageTag: 00463cbc-53a1-4f2e-bddd-f6bc1c2a2945
+
+	measure 'Sessions Cart and Purchase' = ```
+			
+			        CALCULATE(
+			            COUNTROWS(fact_sessions),
+			            fact_sessions[has_cart] = TRUE(),
+			            fact_sessions[has_purchase] = TRUE()
+			        )
+			```
+		formatString: #,0
+		displayFolder: 04_Sales Funnel
+		lineageTag: 8d7a7926-bd6c-40bd-b231-740b4b8e9bde
+
+	measure 'View to Cart Rate' = ```
+			
+			        DIVIDE([Sessions with Cart], [Sessions with View], 0)
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 04_Sales Funnel
+		lineageTag: 51f61f2a-8d14-479e-a2ba-74994a8290b5
+
+	measure 'Cart to Purchase Rate' = ```
+			
+			        DIVIDE([Sessions Cart and Purchase], [Sessions with Cart], 0)
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 04_Sales Funnel
+		lineageTag: 45842544-bc29-4e54-bc81-a6722ec08861
+
+	measure 'Cart Abandonment Rate' = ```
+			
+			        1 - [Cart to Purchase Rate]
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 04_Sales Funnel
+		lineageTag: 6ef2413c-35e0-4a9c-ae94-ad52226852cb
+
+	measure 'Session CR' = ```
+			
+			        DIVIDE(
+			            CALCULATE(COUNTROWS(fact_sessions), fact_sessions[has_purchase] = TRUE()),
+			            COUNTROWS(fact_sessions),
+			            0
+			        )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 04_Sales Funnel
+		lineageTag: 7e156ae1-42d6-4339-b1a4-2f2f0818f3ad
+
+	measure 'Avg Products Viewed per Session' = ```
+			
+			        CALCULATE(
+			            AVERAGE(fact_sessions[distinct_products_viewed]),
+			            fact_sessions[views] > 0
+			        )
+			```
+		formatString: 0.00
+		displayFolder: 06_User Behavior
+		lineageTag: a0d50413-24b6-459d-8544-08e8d6313d3e
+
+	measure 'Avg Events per Day' = ```
+			
+			        DIVIDE([Total Events], COUNTROWS(dim_date), 0)
+			```
+		formatString: #,0
+		displayFolder: 08_Traffic
+		lineageTag: bb1e3f4c-a5a6-49a6-acd6-0694c7a4c9de
+
+	measure 'Orders without Cart %' = ```
+			
+			        DIVIDE(
+			            CALCULATE(
+			                COUNTROWS(fact_sessions),
+			                fact_sessions[has_purchase] = TRUE(),
+			                fact_sessions[has_cart] = FALSE()
+			            ),
+			            CALCULATE(COUNTROWS(fact_sessions), fact_sessions[has_purchase] = TRUE()),
+			            0
+			        )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 04_Sales Funnel
+		lineageTag: 5317969b-70a8-4d36-a99a-252e4137e7e1
+
+	measure 'Cart Items' = ```
+			
+			        COUNTROWS(fact_cart_items)
+			```
+		formatString: #,0
+		displayFolder: 07_Abandoned Carts
+		lineageTag: 27d13636-8a1c-47ce-a8e3-c8ae3f2baede
+
+	measure 'Abandoned Cart Items' = ```
+			
+			        CALCULATE(
+			            COUNTROWS(fact_cart_items),
+			            fact_cart_items[purchased_same_session] = FALSE()
+			        )
+			```
+		formatString: #,0
+		displayFolder: 07_Abandoned Carts
+		lineageTag: 4e3036de-0413-47a6-b555-5ca1196e6d04
+
+	measure 'Cart Item Abandonment Rate' = ```
+			
+			        DIVIDE([Abandoned Cart Items], [Cart Items], 0)
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07_Abandoned Carts
+		lineageTag: 1082487b-b251-4947-9d32-98e19b1aa7dd
+
+	measure 'Abandoned Cart Value' = ```
+			
+			        CALCULATE(
+			            SUM(fact_cart_items[cart_price]),
+			            fact_cart_items[purchased_same_session] = FALSE()
+			        )
+			```
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 07_Abandoned Carts
+		lineageTag: 52352509-3a10-4bd7-8a05-c045ffa30aed
+
+	measure 'Lost Cart Value' = ```
+			
+			        CALCULATE(
+			            SUM(fact_cart_items[cart_price]),
+			            fact_cart_items[purchased_same_session] = FALSE(),
+			            fact_cart_items[purchased_later] = FALSE()
+			        )
+			```
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 07_Abandoned Carts
+		lineageTag: e28935fd-3069-4feb-b0f4-c819d9747a55
+
+	measure 'GMV Top 2 Brands' = ```
+			
+			        VAR Top2 =
+			            TOPN(2, FILTER(ALL(dim_products[brand]), dim_products[brand] <> "Unknown"), [GMV])
+			        RETURN CALCULATE([GMV], Top2)
+			```
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 05_Catalog
+		lineageTag: ee89a988-e477-4905-92d9-5a894251675e
+
+	measure 'GMV Other Brands' = [GMV] - [GMV Top 2 Brands]
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 05_Catalog
+		lineageTag: 328e7bd6-db62-47dd-b13c-87d8d04339d5
+
+	measure 'Top 2 Brands GMV %' = DIVIDE([GMV Top 2 Brands], [GMV], 0)
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: 05_Catalog
+		lineageTag: 589676e8-7509-4634-9458-f45683933c3e
+
+	column Стовпець1
+		dataType: string
+		isHidden
+		lineageTag: a6806496-e8f2-412e-af06-aabfc94876cc
+		summarizeBy: none
+		sourceColumn: Стовпець1
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				  Джерело = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Стовпець1 = _t])
+				in
+				  Джерело
+
+	annotation PBI_NavigationStepName = Навігація
+
+	annotation PBI_ResultType = Table
+

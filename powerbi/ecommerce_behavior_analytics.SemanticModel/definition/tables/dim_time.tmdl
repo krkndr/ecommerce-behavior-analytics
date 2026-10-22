@@ -1,0 +1,56 @@
+table dim_time
+	lineageTag: 35679527-8cda-48e0-8788-487d53be91f4
+
+	column event_hour
+		formatString: 0
+		lineageTag: 3a622cac-459e-44a7-9354-a2abbcceea11
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [event_hour]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Time Category'
+		lineageTag: 1c94918a-cca0-4b23-8aba-0069766a1018
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Time Category]
+		sortByColumn: 'Sort Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sort Order'
+		formatString: 0
+		lineageTag: eda03491-1f54-4337-b8ee-3b7638a979e1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Sort Order]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_time = calculated
+		mode: import
+		source = ```
+				
+				SELECTCOLUMNS (
+				    GENERATESERIES ( 0, 23, 1 ),
+				    "event_hour", [Value],
+				    "Time Category", 
+				        SWITCH ( TRUE(),
+				            [Value] < 6, "Night",
+				            [Value] < 12, "Morning",
+				            [Value] < 18, "Day",
+				            "Evening"
+				        ),
+				    "Sort Order",
+				        SWITCH ( TRUE(),
+				            [Value] < 6, 1,
+				            [Value] < 12, 2,
+				            [Value] < 18, 3,
+				            4
+				        )
+				)
+				```
+
+	annotation PBI_Id = c50dcfe2e3a44d6991667d0ec4e8b5aa
+

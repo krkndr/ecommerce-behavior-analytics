@@ -1,0 +1,26 @@
+model Model
+	culture: uk-UA
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: uk-UA
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["dim_products","dim_users","fact_events","_Measures","fact_funnel_steps","fact_sessions","fact_cart_items"]
+
+annotation PBI_ProTooling = ["DaxQueryView_Desktop","DevMode"]
+
+ref table dim_products
+ref table dim_users
+ref table fact_events
+ref table _Measures
+ref table dim_date
+ref table dim_time
+ref table fact_funnel_steps
+ref table fact_sessions
+ref table fact_cart_items
+
+ref cultureInfo uk-UA
+

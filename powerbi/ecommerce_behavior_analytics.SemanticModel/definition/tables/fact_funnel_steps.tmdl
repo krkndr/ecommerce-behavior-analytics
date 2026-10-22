@@ -1,0 +1,118 @@
+table fact_funnel_steps
+	lineageTag: 740ed487-72b3-4da1-9dbf-0ccfca2ce701
+
+	column user_session
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: c342f486-8b4a-491d-8ee6-9e57dc210afc
+		summarizeBy: none
+		sourceColumn: user_session
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 64a2a3c1-e180-4eb4-b8dc-95147b86e9d9
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = User
+
+	column product_id
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 0d811ffb-68c8-48e3-87fe-fde7cd2e3ec7
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column current_step
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 3f35b962-2f18-4262-8f6a-584f83b67e2d
+		summarizeBy: none
+		sourceColumn: current_step
+
+		annotation SummarizationSetBy = Automatic
+
+	column next_step
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 6a57d02b-23c3-4656-9e6a-223afc3705bf
+		summarizeBy: none
+		sourceColumn: next_step
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_time
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: a1a16be9-4b6a-4dac-8aff-22be8a958778
+		summarizeBy: none
+		sourceColumn: step_time
+
+		annotation SummarizationSetBy = Automatic
+
+	column next_step_time
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: b5724a8a-3295-4628-9b77-6cd4c7468a04
+		summarizeBy: none
+		sourceColumn: next_step_time
+
+		annotation SummarizationSetBy = Automatic
+
+	column minutes_to_next_step
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: 122516ca-dad7-444b-97ca-8d4faf3fb360
+		summarizeBy: average
+		sourceColumn: minutes_to_next_step
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Time_Cohort =
+			
+			SWITCH(
+			    TRUE(),
+			    fact_funnel_steps[minutes_to_next_step] <= 5, "0-5 хв",
+			    fact_funnel_steps[minutes_to_next_step] <= 10, "6-10 хв",
+			    "10+ хв"
+			)
+		lineageTag: 9c4424db-3853-4142-a950-2bce1d2458bd
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_date
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: 2576a974-c6b8-4042-ace2-7477fd4a46af
+		summarizeBy: none
+		sourceColumn: step_date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition fact_funnel_steps = m
+		mode: directQuery
+		source =
+				let
+				  Джерело = PostgreSQL.Database("localhost", "postgres"),
+				  #"Навігація 1" = Джерело{[Schema = "analytics", Item = "fact_funnel_steps"]}[Data]
+				in
+				  #"Навігація 1"
+

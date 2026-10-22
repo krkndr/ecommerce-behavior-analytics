@@ -1,0 +1,14 @@
+# Power BI project: local, user-specific files
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+
+# Power BI DAX query view tabs (scratch queries)
+**/DAXQueries/
+
+# Raw data is too large for Git. Download it from Kaggle (see README)
+*.csv
+
+# OS files
+Thumbs.db
+desktop.ini
+.DS_Store

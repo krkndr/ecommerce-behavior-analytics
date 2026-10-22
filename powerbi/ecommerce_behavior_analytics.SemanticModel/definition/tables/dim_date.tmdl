@@ -1,0 +1,71 @@
+table dim_date
+	lineageTag: 170954ad-a8b8-4564-90e5-2a8dd4498cb8
+	dataCategory: Time
+
+	column Date
+		isKey
+		formatString: General Date
+		lineageTag: 6479c3fb-f3ee-40c1-b89b-6b388ffa317e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of Month'
+		formatString: 0
+		lineageTag: 48cf68e8-53af-4585-bbe3-41e1a3f80012
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Day of Month]
+
+		annotation SummarizationSetBy = User
+
+	column 'Day of Week Num'
+		formatString: 0
+		lineageTag: ac387296-6c82-432b-b791-7b287be8c7b4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Day of Week Num]
+
+		annotation SummarizationSetBy = User
+
+	column 'Day of Week'
+		lineageTag: 74052c6f-d1ed-4c49-ac51-5a338ab72d28
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Day of Week]
+		sortByColumn: 'Day of Week Num'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Weekend'
+		lineageTag: 4d5b91da-d1c8-49e9-bdb8-76bb36bb8b62
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Is Weekend]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of Week Short' = LEFT(dim_date[Day of Week], 3)
+		lineageTag: d4e1b96b-4ccb-4f0f-8e8c-c00afa28f5b1
+		summarizeBy: none
+		sortByColumn: 'Day of Week Num'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_date = calculated
+		mode: import
+		source = ```
+				
+				ADDCOLUMNS (
+				    CALENDAR (DATE(2019, 10, 1), DATE(2019, 10, 31)),
+				    "Day of Month", DAY([Date]),
+				    "Day of Week Num", WEEKDAY([Date], 2), 
+				    "Day of Week", FORMAT([Date], "dddd", "en-US"),
+				    "Is Weekend", IF(WEEKDAY([Date], 2) >= 6, "Weekend", "Weekday")
+				)
+				```
+
+	annotation PBI_Id = 32f0f98340c842a99affc3c0164c71af
+

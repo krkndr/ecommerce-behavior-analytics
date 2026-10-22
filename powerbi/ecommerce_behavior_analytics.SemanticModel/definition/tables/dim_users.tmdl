@@ -1,0 +1,27 @@
+table dim_users
+	lineageTag: ab156cdd-c44a-4429-9352-851d0e396fce
+
+	column user_id
+		dataType: int64
+		isNullable: false
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: bfe231a7-c439-43e1-8279-e9080923b605
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_users = m
+		mode: directQuery
+		source =
+				let
+				  Джерело = PostgreSQL.Database("localhost", "postgres"),
+				  #"Навігація 1" = Джерело{[Schema = "analytics", Item = "dim_users"]}[Data]
+				in
+				  #"Навігація 1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Навігація
+

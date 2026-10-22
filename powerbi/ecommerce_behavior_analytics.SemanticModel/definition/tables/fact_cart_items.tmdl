@@ -1,0 +1,117 @@
+table fact_cart_items
+	lineageTag: 31afe2e6-339d-4d8c-9d56-120094f2441a
+
+	column user_session
+		dataType: string
+		isNullable: false
+		sourceProviderType: nvarchar(max)
+		lineageTag: 237ebc6b-34bb-4812-9020-7edb6f951584
+		summarizeBy: none
+		sourceColumn: user_session
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: a2fa9f1c-4da6-4c50-97d5-6c2bb4fd1e4a
+		summarizeBy: sum
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: int64
+		isNullable: false
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: dec758cf-8ddc-4a97-b89f-71b9113912f9
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_cart_time
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 5a535b0e-e3f5-48e1-8114-65f54075f23d
+		summarizeBy: none
+		sourceColumn: first_cart_time
+
+		annotation SummarizationSetBy = Automatic
+
+	column cart_date
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: 42d53b4c-1d3f-49b2-8d31-a5fd24a8700d
+		summarizeBy: none
+		sourceColumn: cart_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column cart_events
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 1396f23e-08fa-4452-97a7-0b501d9f5ded
+		summarizeBy: sum
+		sourceColumn: cart_events
+
+		annotation SummarizationSetBy = Automatic
+
+	column cart_price
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: 229d144b-aca4-422c-ab12-64deee216967
+		summarizeBy: sum
+		sourceColumn: cart_price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column price_segment
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 6eb157ae-eba9-4dc9-b716-6a6a2ef6440b
+		summarizeBy: none
+		sourceColumn: price_segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column purchased_same_session
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: eddb24de-551f-4665-b8b9-31eb90b2c2b2
+		summarizeBy: none
+		sourceColumn: purchased_same_session
+
+		annotation SummarizationSetBy = Automatic
+
+	column purchased_later
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 3d14ae2b-f6e6-434d-af83-8c55b617a625
+		summarizeBy: none
+		sourceColumn: purchased_later
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_cart_items = m
+		mode: directQuery
+		source =
+				let
+				  Джерело = PostgreSQL.Database("localhost", "postgres"),
+				  #"Навігація 1" = Джерело{[Schema = "analytics", Item = "fact_cart_items"]}[Data]
+				in
+				  #"Навігація 1"
+
+	changedProperty = Name
+

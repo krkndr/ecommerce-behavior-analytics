@@ -1,0 +1,168 @@
+table fact_sessions
+	lineageTag: b18ce619-b78e-4bbf-bb89-f9437ba09e25
+
+	column user_session
+		dataType: string
+		isNullable: false
+		sourceProviderType: nvarchar(max)
+		lineageTag: b1b16e07-9b20-4577-99d5-56f87be7dc3b
+		summarizeBy: none
+		sourceColumn: user_session
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 2a7bf063-4d01-4133-a52b-be0ce9e42a7c
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column session_start
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: a9d1df5d-98c5-4f29-91e4-8c15925e8782
+		summarizeBy: none
+		sourceColumn: session_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column session_end
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 0cc95da3-4e0a-41f0-8c02-b8e6c7a19ba8
+		summarizeBy: none
+		sourceColumn: session_end
+
+		annotation SummarizationSetBy = Automatic
+
+	column session_date
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: 73ec75ea-4f1f-463a-8a96-9d76a25dc39a
+		summarizeBy: none
+		sourceColumn: session_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column views
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 9b77db49-dc1f-4e49-9e48-7c448faf74df
+		summarizeBy: sum
+		sourceColumn: views
+
+		annotation SummarizationSetBy = Automatic
+
+	column carts
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 3badf75f-02fc-41f9-a5f3-7f09fa7f2f5d
+		summarizeBy: sum
+		sourceColumn: carts
+
+		annotation SummarizationSetBy = Automatic
+
+	column removes
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 6188265e-a760-4215-b6b1-c85845966860
+		summarizeBy: sum
+		sourceColumn: removes
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column items_purchased
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 8500e992-6fd3-44cf-a55b-84deb05b844d
+		summarizeBy: sum
+		sourceColumn: items_purchased
+
+		annotation SummarizationSetBy = Automatic
+
+	column distinct_products_viewed
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 89ac137a-e8ee-4469-8ebb-331c2320e208
+		summarizeBy: sum
+		sourceColumn: distinct_products_viewed
+
+		annotation SummarizationSetBy = Automatic
+
+	column gmv
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: 44b4519c-a5d1-438b-8a5a-a1c4868df197
+		summarizeBy: sum
+		sourceColumn: gmv
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column has_cart
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 53504567-ebaa-4d13-b85e-576f4ee177c4
+		summarizeBy: none
+		sourceColumn: has_cart
+
+		annotation SummarizationSetBy = Automatic
+
+	column has_purchase
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 6126bbbc-f90b-4a63-9dd9-b8cdb8c37886
+		summarizeBy: none
+		sourceColumn: has_purchase
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_cart_time
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 7c5bd66a-470c-4b40-b2f7-f4c3d06a5ec3
+		summarizeBy: none
+		sourceColumn: first_cart_time
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_purchase_time
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 6f7b1520-b313-4b9f-b759-7b9b14e98ff1
+		summarizeBy: none
+		sourceColumn: first_purchase_time
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_sessions = m
+		mode: directQuery
+		source =
+				let
+				  Джерело = PostgreSQL.Database("localhost", "postgres"),
+				  #"Навігація 1" = Джерело{[Schema = "analytics", Item = "fact_sessions"]}[Data]
+				in
+				  #"Навігація 1"
+

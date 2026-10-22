@@ -1,0 +1,26 @@
+// ============================================================================
+// validation_query.dax
+// ----------------------------------------------------------------------------
+// Reconciles the Power BI measures with the SQL reference values
+// (query 6 in sql/06_data_validation.sql).
+// How to run: Power BI Desktop -> DAX query view -> paste -> Run.
+//
+// Expected (October 2019):
+//   GMV 229 933 212.63 | Orders 629 560 | AOV 365.23 | MAU 3 022 061
+//   ARPU 76.08 | Payers 347 118 | ARPPU 662.41 | Session CR 0.0681
+// ============================================================================
+
+EVALUATE
+ROW(
+    "GMV",                  [GMV],
+    "Orders",               [Total Orders],
+    "AOV",                  [AOV],
+    "MAU",                  [Total Active Users (MAU)],
+    "ARPU",                 [ARPU],
+    "Payers",               [Unique Payers],
+    "ARPPU",                [ARPPU],
+    "Session CR",           [Session CR],
+    "Cart Abandonment",     [Cart Abandonment Rate],
+    "Orders without Cart",  [Orders without Cart %],
+    "Top-2 brands share",   [Top 2 Brands GMV %]
+)
